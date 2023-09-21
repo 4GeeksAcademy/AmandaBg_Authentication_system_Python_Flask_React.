@@ -93,7 +93,7 @@ def signup():
         raise APIException("An email must be provided", status_code=400) #bad request
     if "password" not in body:
         raise APIException("A password must be provided", status_code=400) #bad request
-    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-')
+    pw_hash = bcrypt.generate_password_hash(body['password']).decode('utf-8')
     new_user = User(email = body['email'], password = pw_hash, is_active = True)
     db.session.add(new_user)
     db.session.commit()
@@ -106,7 +106,7 @@ def signup():
 def login():
     body = request.get_json(silent=True)
     if body is None:
-        raise APIException("Must send information in body", status_code=400) #bad request
+        raise APIException("Must send information in body, please", status_code=400) #bad request
     if "email" not in body:
         raise APIException("An email must be provided", status_code=400) #bad request
     if "password" not in body:
@@ -115,6 +115,7 @@ def login():
     # ------Looking for user and their email
     user_data = User.query.filter_by(email= body['email']).first()
     print(user_data)
+
 
     #--------User exists
     if user_data is None:
@@ -128,6 +129,7 @@ def login():
     access_token = create_access_token(identity=body['email'])
     return jsonify(access_token=access_token), 200
 
+    # return jsonify({"login": "Login Completado"}), 200
 
 # ENDPOINT FOR GETTING JSON WEB TOKEN
 # AUTHENTICATES LOGGED USER
@@ -136,7 +138,7 @@ def login():
 def private():
     identity = get_jwt_identity() #identity of current user
     return jsonify({ "msg": "The Token is now working.", "User identity" : identity }), 200
-    
+
 
 
 
